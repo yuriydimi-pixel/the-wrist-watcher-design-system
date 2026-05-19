@@ -1,0 +1,1555 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Precision Watches — Design System</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;0,600;1,300;1,400&family=Jost:wght@200;300;400;500&display=swap" rel="stylesheet">
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  :root {
+    --black:    #0a0a0b;
+    --charcoal: #141416;
+    --surface:  #1c1c1f;
+    --border:   #2a2a2e;
+    --muted:    #5a5a62;
+    --silver:   #9a9aa8;
+    --light:    #e8e8ec;
+    --white:    #f5f4f0;
+    --gold:     #c8a96e;
+    --gold-lt:  #dfc28e;
+    --gold-dk:  #9e7d46;
+    --red:      #8b2020;
+
+    --font-serif: 'Cormorant Garamond', Georgia, serif;
+    --font-sans:  'Jost', sans-serif;
+
+    --ease-luxury: cubic-bezier(0.25, 0.1, 0.1, 1);
+    --transition: 0.55s var(--ease-luxury);
+  }
+
+  html { scroll-behavior: smooth; }
+
+  body {
+    background: var(--black);
+    color: var(--light);
+    font-family: var(--font-sans);
+    font-weight: 300;
+    line-height: 1.6;
+    overflow-x: hidden;
+  }
+
+  /* ─── NOISE OVERLAY ─── */
+  body::before {
+    content: '';
+    position: fixed;
+    inset: 0;
+    background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.035'/%3E%3C/svg%3E");
+    pointer-events: none;
+    z-index: 9999;
+    opacity: 0.4;
+  }
+
+  /* ─── SECTIONS ─── */
+  section { padding: 100px 5vw; }
+
+  .section-label {
+    font-family: var(--font-sans);
+    font-size: 10px;
+    font-weight: 400;
+    letter-spacing: 0.3em;
+    text-transform: uppercase;
+    color: var(--gold);
+    margin-bottom: 48px;
+    display: flex;
+    align-items: center;
+    gap: 16px;
+  }
+  .section-label::after {
+    content: '';
+    display: block;
+    height: 1px;
+    width: 48px;
+    background: var(--gold-dk);
+  }
+
+  /* ─── HERO ─── */
+  .hero {
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    padding: 80px 5vw 80px;
+    position: relative;
+    overflow: hidden;
+  }
+
+  .hero-bg {
+    position: absolute;
+    inset: 0;
+    background:
+      radial-gradient(ellipse 60% 80% at 80% 50%, rgba(200,169,110,0.06) 0%, transparent 60%),
+      radial-gradient(ellipse 40% 40% at 20% 80%, rgba(200,169,110,0.04) 0%, transparent 50%),
+      var(--black);
+  }
+
+  /* Animated clock ring */
+  .hero-clock {
+    position: absolute;
+    right: -5vw;
+    top: 50%;
+    transform: translateY(-50%);
+    width: min(55vw, 700px);
+    height: min(55vw, 700px);
+    opacity: 0.12;
+    pointer-events: none;
+  }
+
+  .hero-content { position: relative; z-index: 2; max-width: 800px; }
+
+  .hero-eyebrow {
+    font-family: var(--font-sans);
+    font-size: 10px;
+    font-weight: 400;
+    letter-spacing: 0.4em;
+    text-transform: uppercase;
+    color: var(--gold);
+    margin-bottom: 24px;
+    opacity: 0;
+    animation: fadeUp 1s var(--ease-luxury) 0.2s forwards;
+  }
+
+  .hero-title {
+    font-family: var(--font-serif);
+    font-weight: 300;
+    font-size: clamp(52px, 7vw, 110px);
+    line-height: 0.95;
+    color: var(--white);
+    letter-spacing: -0.01em;
+    margin-bottom: 8px;
+    opacity: 0;
+    animation: fadeUp 1.1s var(--ease-luxury) 0.4s forwards;
+  }
+
+  .hero-title em {
+    font-style: italic;
+    color: var(--gold);
+  }
+
+  .hero-subtitle {
+    font-family: var(--font-serif);
+    font-size: clamp(20px, 3vw, 38px);
+    font-weight: 300;
+    color: var(--silver);
+    margin-bottom: 40px;
+    opacity: 0;
+    animation: fadeUp 1.1s var(--ease-luxury) 0.55s forwards;
+  }
+
+  .hero-desc {
+    font-size: 14px;
+    font-weight: 300;
+    color: var(--muted);
+    max-width: 460px;
+    line-height: 1.8;
+    margin-bottom: 60px;
+    opacity: 0;
+    animation: fadeUp 1s var(--ease-luxury) 0.7s forwards;
+  }
+
+  .hero-meta {
+    display: flex;
+    gap: 48px;
+    opacity: 0;
+    animation: fadeUp 1s var(--ease-luxury) 0.85s forwards;
+  }
+
+  .hero-stat { display: flex; flex-direction: column; gap: 4px; }
+  .hero-stat-num {
+    font-family: var(--font-serif);
+    font-size: 32px;
+    font-weight: 400;
+    color: var(--gold);
+    line-height: 1;
+  }
+  .hero-stat-label {
+    font-size: 9px;
+    letter-spacing: 0.25em;
+    text-transform: uppercase;
+    color: var(--muted);
+  }
+
+  .hero-divider {
+    width: 1px;
+    background: var(--border);
+    align-self: stretch;
+  }
+
+  /* ─── DIVIDER LINE ─── */
+  .gold-rule {
+    width: 100%;
+    height: 1px;
+    background: linear-gradient(90deg, transparent, var(--gold-dk) 20%, var(--gold) 50%, var(--gold-dk) 80%, transparent);
+    opacity: 0.35;
+    margin: 0 5vw;
+    width: 90vw;
+  }
+
+  /* ─── COLORS ─── */
+  .colors-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
+    gap: 24px;
+    margin-top: 16px;
+  }
+
+  .swatch {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+  }
+
+  .swatch-block {
+    height: 100px;
+    border-radius: 4px;
+    position: relative;
+    overflow: hidden;
+    transition: transform 0.3s var(--ease-luxury);
+  }
+  .swatch-block:hover { transform: scale(1.03); }
+
+  .swatch-block::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: url("data:image/svg+xml,%3Csvg viewBox='0 0 64 64' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.8'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.05'/%3E%3C/svg%3E");
+    pointer-events: none;
+  }
+
+  .swatch-name {
+    font-size: 11px;
+    font-weight: 400;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: var(--light);
+  }
+  .swatch-hex {
+    font-size: 11px;
+    color: var(--muted);
+    font-family: 'Courier New', monospace;
+    letter-spacing: 0.05em;
+  }
+
+  /* ─── TYPOGRAPHY ─── */
+  .type-showcase { display: flex; flex-direction: column; gap: 56px; }
+
+  .type-specimen {
+    display: grid;
+    grid-template-columns: 140px 1fr;
+    gap: 32px;
+    align-items: baseline;
+    padding-bottom: 40px;
+    border-bottom: 1px solid var(--border);
+  }
+  .type-specimen:last-child { border-bottom: none; }
+
+  .type-meta { display: flex; flex-direction: column; gap: 4px; }
+  .type-role {
+    font-size: 9px;
+    letter-spacing: 0.3em;
+    text-transform: uppercase;
+    color: var(--gold);
+  }
+  .type-spec {
+    font-size: 11px;
+    color: var(--muted);
+    line-height: 1.7;
+  }
+
+  .t-display {
+    font-family: var(--font-serif);
+    font-size: clamp(48px, 6vw, 96px);
+    font-weight: 300;
+    color: var(--white);
+    line-height: 0.95;
+    letter-spacing: -0.01em;
+  }
+  .t-display em { font-style: italic; color: var(--gold); }
+
+  .t-headline {
+    font-family: var(--font-serif);
+    font-size: clamp(28px, 3.5vw, 48px);
+    font-weight: 400;
+    color: var(--white);
+    line-height: 1.1;
+  }
+
+  .t-subhead {
+    font-family: var(--font-serif);
+    font-size: clamp(18px, 2vw, 24px);
+    font-weight: 300;
+    font-style: italic;
+    color: var(--silver);
+    line-height: 1.4;
+  }
+
+  .t-eyebrow {
+    font-family: var(--font-sans);
+    font-size: 10px;
+    font-weight: 400;
+    letter-spacing: 0.4em;
+    text-transform: uppercase;
+    color: var(--gold);
+  }
+
+  .t-body {
+    font-family: var(--font-sans);
+    font-size: 15px;
+    font-weight: 300;
+    color: var(--light);
+    line-height: 1.8;
+    max-width: 600px;
+  }
+
+  .t-caption {
+    font-family: var(--font-sans);
+    font-size: 11px;
+    font-weight: 400;
+    color: var(--silver);
+    letter-spacing: 0.08em;
+    line-height: 1.6;
+  }
+
+  /* ─── BUTTONS ─── */
+  .buttons-showcase {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 24px;
+    align-items: center;
+  }
+
+  .btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 10px;
+    font-family: var(--font-sans);
+    font-weight: 400;
+    font-size: 10px;
+    letter-spacing: 0.3em;
+    text-transform: uppercase;
+    cursor: pointer;
+    border: none;
+    text-decoration: none;
+    transition: all var(--transition);
+    position: relative;
+    overflow: hidden;
+  }
+
+  .btn-primary {
+    background: transparent;
+    color: var(--black);
+    padding: 0;
+  }
+  .btn-primary-inner {
+    display: inline-flex;
+    align-items: center;
+    gap: 12px;
+    padding: 14px 32px;
+    background: var(--gold);
+    position: relative;
+    z-index: 1;
+    transition: all var(--transition);
+  }
+  .btn-primary:hover .btn-primary-inner {
+    background: var(--gold-lt);
+    transform: translate(3px, -3px);
+    box-shadow: -3px 3px 0 var(--gold-dk);
+  }
+
+  .btn-secondary {
+    background: transparent;
+    color: var(--light);
+    padding: 13px 32px;
+    border: 1px solid var(--border);
+    letter-spacing: 0.3em;
+  }
+  .btn-secondary::after {
+    content: '';
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    width: 0;
+    height: 1px;
+    background: var(--gold);
+    transition: width var(--transition);
+  }
+  .btn-secondary:hover { border-color: var(--gold); color: var(--gold); }
+  .btn-secondary:hover::after { width: 100%; }
+
+  .btn-ghost {
+    background: transparent;
+    color: var(--gold);
+    padding: 0;
+    letter-spacing: 0.25em;
+  }
+  .btn-ghost::after {
+    content: '';
+    position: absolute;
+    bottom: -2px;
+    left: 0;
+    width: 100%;
+    height: 1px;
+    background: var(--gold-dk);
+    transform: scaleX(0.3);
+    transform-origin: left;
+    transition: transform var(--transition);
+  }
+  .btn-ghost:hover::after { transform: scaleX(1); }
+
+  .btn-arrow {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    transition: gap var(--transition);
+  }
+  .btn-arrow:hover { gap: 16px; }
+  .btn-arrow svg { transition: transform 0.3s; }
+  .btn-arrow:hover svg { transform: translateX(4px); }
+
+  /* ─── CARDS ─── */
+  .cards-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+    gap: 2px;
+    background: var(--border);
+  }
+
+  .card {
+    background: var(--charcoal);
+    padding: 40px;
+    position: relative;
+    overflow: hidden;
+    transition: all var(--transition);
+  }
+
+  .card::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 2px;
+    height: 0;
+    background: linear-gradient(180deg, var(--gold), var(--gold-dk));
+    transition: height var(--transition);
+  }
+  .card:hover::before { height: 100%; }
+
+  .card-icon {
+    width: 40px;
+    height: 40px;
+    margin-bottom: 24px;
+    color: var(--gold);
+    opacity: 0.7;
+  }
+
+  .card-title {
+    font-family: var(--font-serif);
+    font-size: 22px;
+    font-weight: 400;
+    color: var(--white);
+    margin-bottom: 12px;
+    line-height: 1.2;
+  }
+
+  .card-body {
+    font-size: 13px;
+    color: var(--muted);
+    line-height: 1.8;
+    margin-bottom: 32px;
+  }
+
+  .card-link {
+    font-size: 9px;
+    letter-spacing: 0.3em;
+    text-transform: uppercase;
+    color: var(--gold);
+    text-decoration: none;
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    transition: gap var(--transition);
+  }
+  .card-link:hover { gap: 14px; }
+
+  /* ─── PRODUCT CARD ─── */
+  .product-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
+    gap: 32px;
+  }
+
+  .product-card {
+    background: var(--charcoal);
+    border: 1px solid var(--border);
+    position: relative;
+    overflow: hidden;
+    transition: transform var(--transition);
+    cursor: pointer;
+  }
+  .product-card:hover { transform: translateY(-4px); }
+
+  .product-card-img {
+    height: 220px;
+    background: var(--surface);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    position: relative;
+    overflow: hidden;
+  }
+
+  .product-card-img::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: radial-gradient(circle at 50% 50%, rgba(200,169,110,0.05) 0%, transparent 70%);
+  }
+
+  .watch-svg { width: 120px; height: 120px; }
+
+  .product-card-tag {
+    position: absolute;
+    top: 16px;
+    right: 16px;
+    font-size: 8px;
+    letter-spacing: 0.25em;
+    text-transform: uppercase;
+    padding: 4px 10px;
+    background: var(--gold);
+    color: var(--black);
+    font-weight: 500;
+  }
+
+  .product-card-body { padding: 24px; }
+
+  .product-brand {
+    font-size: 9px;
+    letter-spacing: 0.3em;
+    text-transform: uppercase;
+    color: var(--gold);
+    margin-bottom: 8px;
+  }
+
+  .product-name {
+    font-family: var(--font-serif);
+    font-size: 20px;
+    font-weight: 400;
+    color: var(--white);
+    margin-bottom: 4px;
+    line-height: 1.2;
+  }
+
+  .product-ref {
+    font-size: 11px;
+    color: var(--muted);
+    margin-bottom: 20px;
+  }
+
+  .product-price {
+    font-family: var(--font-serif);
+    font-size: 24px;
+    font-weight: 400;
+    color: var(--gold);
+  }
+
+  /* ─── FORM ELEMENTS ─── */
+  .form-showcase {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 24px;
+    max-width: 700px;
+  }
+
+  .form-group { display: flex; flex-direction: column; gap: 8px; }
+  .form-group.full { grid-column: 1 / -1; }
+
+  .form-label {
+    font-size: 9px;
+    letter-spacing: 0.3em;
+    text-transform: uppercase;
+    color: var(--gold);
+  }
+
+  .form-input {
+    background: transparent;
+    border: none;
+    border-bottom: 1px solid var(--border);
+    padding: 12px 0;
+    font-family: var(--font-sans);
+    font-size: 14px;
+    font-weight: 300;
+    color: var(--light);
+    outline: none;
+    transition: border-color var(--transition);
+    width: 100%;
+  }
+  .form-input::placeholder { color: var(--muted); font-size: 13px; }
+  .form-input:focus { border-color: var(--gold); }
+
+  select.form-input {
+    appearance: none;
+    cursor: pointer;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='6' fill='none'%3E%3Cpath d='M1 1l4 4 4-4' stroke='%239e7d46' stroke-width='1.5' stroke-linecap='round'/%3E%3C/svg%3E");
+    background-repeat: no-repeat;
+    background-position: right 4px center;
+    padding-right: 20px;
+  }
+  select.form-input option { background: var(--charcoal); }
+
+  /* ─── NAVIGATION ─── */
+  .nav-showcase {
+    background: rgba(10,10,11,0.95);
+    border-bottom: 1px solid var(--border);
+    padding: 0 40px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    height: 72px;
+    position: relative;
+  }
+  .nav-showcase::after {
+    content: '';
+    position: absolute;
+    bottom: 0;
+    left: 40px;
+    right: 40px;
+    height: 1px;
+    background: linear-gradient(90deg, transparent, var(--gold-dk) 30%, var(--gold-dk) 70%, transparent);
+    opacity: 0.2;
+  }
+
+  .nav-logo {
+    font-family: var(--font-serif);
+    font-size: 18px;
+    font-weight: 400;
+    color: var(--white);
+    letter-spacing: 0.1em;
+    display: flex;
+    flex-direction: column;
+    line-height: 1;
+  }
+  .nav-logo span {
+    font-size: 8px;
+    letter-spacing: 0.4em;
+    text-transform: uppercase;
+    color: var(--gold);
+    font-family: var(--font-sans);
+    font-weight: 400;
+    margin-top: 2px;
+  }
+
+  .nav-links {
+    display: flex;
+    gap: 40px;
+    list-style: none;
+  }
+  .nav-links a {
+    font-size: 10px;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    color: var(--silver);
+    text-decoration: none;
+    transition: color 0.3s;
+    position: relative;
+  }
+  .nav-links a::after {
+    content: '';
+    position: absolute;
+    bottom: -4px;
+    left: 0;
+    width: 0;
+    height: 1px;
+    background: var(--gold);
+    transition: width 0.3s;
+  }
+  .nav-links a:hover { color: var(--gold); }
+  .nav-links a:hover::after { width: 100%; }
+  .nav-links a.active { color: var(--white); }
+
+  .nav-actions {
+    display: flex;
+    align-items: center;
+    gap: 24px;
+  }
+
+  .nav-icon {
+    width: 18px;
+    height: 18px;
+    color: var(--silver);
+    cursor: pointer;
+    transition: color 0.3s;
+  }
+  .nav-icon:hover { color: var(--gold); }
+
+  /* ─── BADGES / TAGS ─── */
+  .badges-showcase {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 16px;
+    align-items: center;
+  }
+
+  .badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    font-size: 9px;
+    letter-spacing: 0.25em;
+    text-transform: uppercase;
+    font-weight: 400;
+    padding: 6px 14px;
+  }
+
+  .badge-gold { background: rgba(200,169,110,0.1); color: var(--gold); border: 1px solid rgba(200,169,110,0.25); }
+  .badge-dark { background: var(--surface); color: var(--silver); border: 1px solid var(--border); }
+  .badge-outline { background: transparent; color: var(--light); border: 1px solid var(--border); }
+  .badge-sold { background: rgba(139,32,32,0.15); color: #d97070; border: 1px solid rgba(139,32,32,0.3); }
+
+  .badge-dot::before {
+    content: '';
+    width: 5px;
+    height: 5px;
+    border-radius: 50%;
+    background: currentColor;
+    flex-shrink: 0;
+  }
+
+  /* ─── ICON SYSTEM ─── */
+  .icons-grid {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 32px;
+  }
+
+  .icon-item {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 12px;
+    padding: 24px;
+    background: var(--charcoal);
+    border: 1px solid var(--border);
+    min-width: 80px;
+    transition: border-color 0.3s;
+    cursor: pointer;
+  }
+  .icon-item:hover { border-color: var(--gold); }
+  .icon-item:hover svg { color: var(--gold); }
+  .icon-item svg { color: var(--silver); transition: color 0.3s; }
+  .icon-item span {
+    font-size: 9px;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    color: var(--muted);
+  }
+
+  /* ─── HERO BANNER COMPONENT ─── */
+  .hero-banner {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    padding: 80px;
+    position: relative;
+    overflow: hidden;
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 40px;
+    align-items: center;
+  }
+
+  .hero-banner::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    bottom: 0;
+    width: 3px;
+    background: linear-gradient(180deg, transparent, var(--gold), transparent);
+  }
+
+  .hero-banner-bg {
+    position: absolute;
+    right: 0;
+    top: 0;
+    bottom: 0;
+    width: 50%;
+    background: radial-gradient(ellipse at 60% 50%, rgba(200,169,110,0.04) 0%, transparent 60%);
+  }
+
+  .banner-label {
+    font-size: 9px;
+    letter-spacing: 0.4em;
+    text-transform: uppercase;
+    color: var(--gold);
+    margin-bottom: 16px;
+  }
+
+  .banner-title {
+    font-family: var(--font-serif);
+    font-size: clamp(28px, 3vw, 44px);
+    font-weight: 300;
+    color: var(--white);
+    line-height: 1.1;
+    margin-bottom: 16px;
+  }
+
+  .banner-title em { font-style: italic; color: var(--gold); }
+
+  .banner-body {
+    font-size: 13px;
+    color: var(--muted);
+    line-height: 1.8;
+    margin-bottom: 36px;
+  }
+
+  .banner-img-area {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    position: relative;
+    z-index: 1;
+  }
+
+  /* ─── SPACING SCALE ─── */
+  .spacing-showcase {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+  }
+
+  .spacing-row {
+    display: flex;
+    align-items: center;
+    gap: 24px;
+  }
+
+  .spacing-bar {
+    background: linear-gradient(90deg, var(--gold-dk), transparent);
+    height: 28px;
+    opacity: 0.6;
+    border-radius: 2px;
+    min-width: 4px;
+  }
+
+  .spacing-label {
+    font-family: 'Courier New', monospace;
+    font-size: 11px;
+    color: var(--muted);
+    min-width: 90px;
+  }
+
+  .spacing-px {
+    font-size: 11px;
+    color: var(--silver);
+  }
+
+  /* ─── FOOTER OF PAGE ─── */
+  .page-footer {
+    padding: 60px 5vw 40px;
+    border-top: 1px solid var(--border);
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 24px;
+  }
+
+  .footer-brand {
+    font-family: var(--font-serif);
+    font-size: 22px;
+    font-weight: 300;
+    color: var(--white);
+    letter-spacing: 0.08em;
+  }
+  .footer-brand span {
+    font-size: 9px;
+    display: block;
+    letter-spacing: 0.4em;
+    text-transform: uppercase;
+    color: var(--gold);
+    font-family: var(--font-sans);
+    font-weight: 400;
+    margin-top: 4px;
+  }
+
+  .footer-note {
+    font-size: 11px;
+    color: var(--muted);
+    text-align: right;
+  }
+  .footer-note strong { color: var(--silver); font-weight: 400; }
+
+  /* ─── SCROLL REVEAL ─── */
+  .reveal {
+    opacity: 0;
+    transform: translateY(24px);
+    transition: opacity 0.8s var(--ease-luxury), transform 0.8s var(--ease-luxury);
+  }
+  .reveal.visible {
+    opacity: 1;
+    transform: none;
+  }
+
+  /* ─── ANIMATIONS ─── */
+  @keyframes fadeUp {
+    from { opacity: 0; transform: translateY(20px); }
+    to   { opacity: 1; transform: none; }
+  }
+
+  @keyframes rotateSlow {
+    from { transform: translateY(-50%) rotate(0deg); }
+    to   { transform: translateY(-50%) rotate(360deg); }
+  }
+
+  @keyframes pulseFade {
+    0%, 100% { opacity: 0.08; }
+    50%       { opacity: 0.15; }
+  }
+
+  .hero-clock { animation: pulseFade 8s ease-in-out infinite; }
+
+  /* ─── RESPONSIVE ─── */
+  @media (max-width: 768px) {
+    section { padding: 64px 6vw; }
+
+    .type-specimen { grid-template-columns: 1fr; gap: 16px; }
+    .form-showcase { grid-template-columns: 1fr; }
+    .form-group.full { grid-column: 1; }
+    .hero-banner { grid-template-columns: 1fr; padding: 40px 32px; }
+    .hero-banner-bg { display: none; }
+    .hero-meta { flex-wrap: wrap; gap: 24px; }
+    .hero-divider { display: none; }
+    .nav-links { display: none; }
+    .nav-showcase { padding: 0 20px; }
+    .hero { padding: 80px 6vw 64px; }
+    .hero-clock { display: none; }
+    .page-footer { flex-direction: column; align-items: flex-start; }
+    .footer-note { text-align: left; }
+    .cards-grid { grid-template-columns: 1fr; }
+    .hero-banner { gap: 32px; }
+  }
+
+  @media (max-width: 480px) {
+    .hero-title { font-size: 42px; }
+    .colors-grid { grid-template-columns: repeat(2, 1fr); }
+    .product-grid { grid-template-columns: 1fr; }
+  }
+</style>
+</head>
+<body>
+
+<!-- HERO -->
+<section class="hero">
+  <div class="hero-bg"></div>
+
+  <!-- Abstract clock graphic -->
+  <svg class="hero-clock" viewBox="0 0 500 500" fill="none" xmlns="http://www.w3.org/2000/svg">
+    <circle cx="250" cy="250" r="240" stroke="#c8a96e" stroke-width="0.5"/>
+    <circle cx="250" cy="250" r="200" stroke="#c8a96e" stroke-width="0.3"/>
+    <circle cx="250" cy="250" r="180" stroke="#c8a96e" stroke-width="0.5"/>
+    <circle cx="250" cy="250" r="160" stroke="#9e7d46" stroke-width="0.3" stroke-dasharray="4 8"/>
+    <!-- hour marks -->
+    <line x1="250" y1="20" x2="250" y2="50" stroke="#c8a96e" stroke-width="1.5"/>
+    <line x1="250" y1="450" x2="250" y2="480" stroke="#c8a96e" stroke-width="1.5"/>
+    <line x1="20" y1="250" x2="50" y2="250" stroke="#c8a96e" stroke-width="1.5"/>
+    <line x1="450" y1="250" x2="480" y2="250" stroke="#c8a96e" stroke-width="1.5"/>
+    <line x1="74" y1="74" x2="95" y2="95" stroke="#c8a96e" stroke-width="1"/>
+    <line x1="405" y1="74" x2="426" y2="95" stroke="#c8a96e" stroke-width="1"/>
+    <line x1="74" y1="426" x2="95" y2="405" stroke="#c8a96e" stroke-width="1"/>
+    <line x1="405" y1="426" x2="426" y2="405" stroke="#c8a96e" stroke-width="1"/>
+    <!-- minute marks smaller -->
+    <circle cx="250" cy="35" r="2" fill="#9e7d46" opacity="0.5"/>
+    <circle cx="324" cy="47" r="1.5" fill="#9e7d46" opacity="0.4"/>
+    <circle cx="388" cy="88" r="1.5" fill="#9e7d46" opacity="0.4"/>
+    <!-- center crosshairs -->
+    <line x1="250" y1="150" x2="250" y2="350" stroke="#c8a96e" stroke-width="0.5" opacity="0.4"/>
+    <line x1="150" y1="250" x2="350" y2="250" stroke="#c8a96e" stroke-width="0.5" opacity="0.4"/>
+    <circle cx="250" cy="250" r="6" fill="#c8a96e"/>
+    <circle cx="250" cy="250" r="3" fill="#0a0a0b"/>
+    <!-- hands -->
+    <line x1="250" y1="250" x2="250" y2="100" stroke="#c8a96e" stroke-width="1.5" stroke-linecap="round"/>
+    <line x1="250" y1="250" x2="320" y2="200" stroke="#c8a96e" stroke-width="1" stroke-linecap="round" opacity="0.7"/>
+    <line x1="250" y1="250" x2="210" y2="290" stroke="#9e7d46" stroke-width="0.8" opacity="0.5"/>
+  </svg>
+
+  <div class="hero-content">
+    <p class="hero-eyebrow">Design System — Portfolio Case Study</p>
+    <h1 class="hero-title">Precision<br><em>Watches</em></h1>
+    <p class="hero-subtitle">Watchmakers Since 1946</p>
+    <p class="hero-desc">A comprehensive luxury e-commerce design system built for Pennsylvania's premier authorized watch retailer — Official Rolex Jeweler, Swiss-trained since 1946. Every element crafted to reflect heritage, precision, and the refinement of Swiss horology.</p>
+    <div class="hero-meta">
+      <div class="hero-stat">
+        <div class="hero-stat-num">1946</div>
+        <div class="hero-stat-label">Founded</div>
+      </div>
+      <div class="hero-divider"></div>
+      <div class="hero-stat">
+        <div class="hero-stat-num">3rd</div>
+        <div class="hero-stat-label">Generation</div>
+      </div>
+      <div class="hero-divider"></div>
+      <div class="hero-stat">
+        <div class="hero-stat-num">5+</div>
+        <div class="hero-stat-label">Luxury Brands</div>
+      </div>
+      <div class="hero-divider"></div>
+      <div class="hero-stat">
+        <div class="hero-stat-num">$50K</div>
+        <div class="hero-stat-label">Max Price Point</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<div class="gold-rule"></div>
+
+<!-- NAVIGATION -->
+<section style="padding: 80px 5vw;">
+  <div class="reveal">
+    <div class="section-label">01 — Navigation</div>
+    <div class="nav-showcase" style="margin-bottom: 2px;">
+      <div class="nav-logo">
+        Precision
+        <span>Watchmakers Since 1946</span>
+      </div>
+      <ul class="nav-links">
+        <li><a href="#" class="active">Collections</a></li>
+        <li><a href="#">Brands</a></li>
+        <li><a href="#">Sell Your Watch</a></li>
+        <li><a href="#">Service</a></li>
+        <li><a href="#">About</a></li>
+      </ul>
+      <div class="nav-actions">
+        <!-- Search -->
+        <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg>
+        <!-- Heart -->
+        <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/></svg>
+        <!-- Cart -->
+        <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M6 2L3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4z"/><line x1="3" y1="6" x2="21" y2="6"/><path d="M16 10a4 4 0 0 1-8 0"/></svg>
+      </div>
+    </div>
+    <!-- Mobile nav indicator -->
+    <div style="background:var(--surface);border:1px solid var(--border);padding:20px 24px;display:flex;align-items:center;justify-content:space-between;border-top:none;">
+      <div class="nav-logo">Precision <span>Watchmakers Since 1946</span></div>
+      <div style="display:flex;align-items:center;gap:16px;">
+        <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg>
+        <svg width="20" height="14" viewBox="0 0 20 14" fill="none" style="color:var(--silver);cursor:pointer;"><rect y="0" width="20" height="1.5" fill="currentColor"/><rect y="6" width="14" height="1.5" fill="currentColor"/><rect y="12" width="20" height="1.5" fill="currentColor"/></svg>
+      </div>
+    </div>
+    <p class="t-caption" style="margin-top:12px;color:var(--muted);">Desktop nav (top) · Mobile nav (bottom)</p>
+  </div>
+</section>
+
+<!-- COLORS -->
+<section style="background: var(--charcoal);">
+  <div class="reveal">
+    <div class="section-label">02 — Color Palette</div>
+    <div class="colors-grid">
+      <div class="swatch">
+        <div class="swatch-block" style="background:#c8a96e; height: 140px;"></div>
+        <div class="swatch-name">Gold Primary</div>
+        <div class="swatch-hex">#C8A96E</div>
+      </div>
+      <div class="swatch">
+        <div class="swatch-block" style="background:#dfc28e;"></div>
+        <div class="swatch-name">Gold Light</div>
+        <div class="swatch-hex">#DFC28E</div>
+      </div>
+      <div class="swatch">
+        <div class="swatch-block" style="background:#9e7d46;"></div>
+        <div class="swatch-name">Gold Dark</div>
+        <div class="swatch-hex">#9E7D46</div>
+      </div>
+      <div class="swatch">
+        <div class="swatch-block" style="background:#0a0a0b;"></div>
+        <div class="swatch-name">Obsidian</div>
+        <div class="swatch-hex">#0A0A0B</div>
+      </div>
+      <div class="swatch">
+        <div class="swatch-block" style="background:#141416;"></div>
+        <div class="swatch-name">Charcoal</div>
+        <div class="swatch-hex">#141416</div>
+      </div>
+      <div class="swatch">
+        <div class="swatch-block" style="background:#1c1c1f;"></div>
+        <div class="swatch-name">Surface</div>
+        <div class="swatch-hex">#1C1C1F</div>
+      </div>
+      <div class="swatch">
+        <div class="swatch-block" style="background:#9a9aa8;"></div>
+        <div class="swatch-name">Silver</div>
+        <div class="swatch-hex">#9A9AA8</div>
+      </div>
+      <div class="swatch">
+        <div class="swatch-block" style="background:#f5f4f0;"></div>
+        <div class="swatch-name">Ivory</div>
+        <div class="swatch-hex">#F5F4F0</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- TYPOGRAPHY -->
+<section>
+  <div class="reveal">
+    <div class="section-label">03 — Typography</div>
+    <div class="type-showcase">
+      <div class="type-specimen">
+        <div class="type-meta">
+          <div class="type-role">Display</div>
+          <div class="type-spec">Cormorant Garamond<br>Light 300<br>96px / 0.95 lh</div>
+        </div>
+        <div class="t-display">Time<br><em>Elevated</em></div>
+      </div>
+
+      <div class="type-specimen">
+        <div class="type-meta">
+          <div class="type-role">Headline</div>
+          <div class="type-spec">Cormorant Garamond<br>Regular 400<br>48px / 1.1 lh</div>
+        </div>
+        <div class="t-headline">The Art of Swiss Precision</div>
+      </div>
+
+      <div class="type-specimen">
+        <div class="type-meta">
+          <div class="type-role">Subhead</div>
+          <div class="type-spec">Cormorant Garamond<br>Italic 300<br>24px / 1.4 lh</div>
+        </div>
+        <div class="t-subhead">Authorized Rolex Jeweler & Service Center, Lower Gwynedd, PA</div>
+      </div>
+
+      <div class="type-specimen">
+        <div class="type-meta">
+          <div class="type-role">Eyebrow</div>
+          <div class="type-spec">Jost<br>Regular 400<br>10px / 0.4em tracking</div>
+        </div>
+        <div class="t-eyebrow">Official Rolex Jeweler — Est. 1946</div>
+      </div>
+
+      <div class="type-specimen">
+        <div class="type-meta">
+          <div class="type-role">Body</div>
+          <div class="type-spec">Jost<br>Light 300<br>15px / 1.8 lh</div>
+        </div>
+        <div class="t-body">For over 30 years, our family-owned luxury watch store has provided customers with quality products and exceptional service. Our third-generation business brings you an extensive selection from top Swiss Watch brands.</div>
+      </div>
+
+      <div class="type-specimen">
+        <div class="type-meta">
+          <div class="type-role">Caption</div>
+          <div class="type-spec">Jost<br>Regular 400<br>11px / 0.08em tracking</div>
+        </div>
+        <div class="t-caption">Ref. 126710BLRO · In Stock · Swiss-trained authentication · Free insured overnight shipping</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- BUTTONS -->
+<section style="background: var(--charcoal);">
+  <div class="reveal">
+    <div class="section-label">04 — Buttons & CTAs</div>
+    <div class="buttons-showcase">
+
+      <a class="btn btn-primary" href="#">
+        <span class="btn-primary-inner">
+          Shop Collection
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M5 12h14"/><path d="m12 5 7 7-7 7"/></svg>
+        </span>
+      </a>
+
+      <a class="btn btn-secondary" href="#">View All Brands</a>
+
+      <a class="btn btn-ghost btn-arrow" href="#">
+        Get a Quote
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M5 12h14"/><path d="m12 5 7 7-7 7"/></svg>
+      </a>
+
+      <a class="btn btn-arrow" href="#" style="color: var(--silver); font-size:10px; letter-spacing:0.3em; text-transform:uppercase; text-decoration:none; display:inline-flex; align-items:center; gap:8px; transition: all 0.4s;">
+        Schedule a Visit
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M5 12h14"/><path d="m12 5 7 7-7 7"/></svg>
+      </a>
+    </div>
+  </div>
+</section>
+
+<!-- PRODUCT CARDS -->
+<section>
+  <div class="reveal">
+    <div class="section-label">05 — Product Cards</div>
+    <div class="product-grid">
+
+      <!-- Card 1 -->
+      <div class="product-card">
+        <div class="product-card-img">
+          <svg class="watch-svg" viewBox="0 0 120 160" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <!-- Strap top -->
+            <rect x="44" y="0" width="32" height="40" rx="4" fill="#1c1c1f" stroke="#2a2a2e"/>
+            <rect x="48" y="4" width="24" height="2" rx="1" fill="#2a2a2e"/>
+            <rect x="48" y="9" width="24" height="2" rx="1" fill="#2a2a2e"/>
+            <rect x="48" y="14" width="20" height="2" rx="1" fill="#2a2a2e"/>
+            <!-- Strap bottom -->
+            <rect x="44" y="120" width="32" height="40" rx="4" fill="#1c1c1f" stroke="#2a2a2e"/>
+            <rect x="48" y="146" width="24" height="2" rx="1" fill="#2a2a2e"/>
+            <rect x="48" y="151" width="24" height="2" rx="1" fill="#2a2a2e"/>
+            <!-- Case -->
+            <rect x="20" y="36" width="80" height="88" rx="12" fill="#2a2a2e" stroke="#c8a96e" stroke-width="1.5"/>
+            <rect x="24" y="40" width="72" height="80" rx="10" fill="#141416"/>
+            <!-- Dial ring -->
+            <circle cx="60" cy="80" r="32" stroke="#c8a96e" stroke-width="0.8" fill="none"/>
+            <circle cx="60" cy="80" r="28" stroke="#2a2a2e" stroke-width="1" fill="#0a0a0b"/>
+            <!-- Hour markers -->
+            <line x1="60" y1="52" x2="60" y2="57" stroke="#c8a96e" stroke-width="2" stroke-linecap="round"/>
+            <line x1="60" y1="103" x2="60" y2="108" stroke="#c8a96e" stroke-width="2" stroke-linecap="round"/>
+            <line x1="88" y1="80" x2="83" y2="80" stroke="#c8a96e" stroke-width="2" stroke-linecap="round"/>
+            <line x1="32" y1="80" x2="37" y2="80" stroke="#c8a96e" stroke-width="2" stroke-linecap="round"/>
+            <line x1="80.5" y1="59.5" x2="77" y2="63" stroke="#9e7d46" stroke-width="1.5" stroke-linecap="round"/>
+            <line x1="39.5" y1="59.5" x2="43" y2="63" stroke="#9e7d46" stroke-width="1.5" stroke-linecap="round"/>
+            <line x1="80.5" y1="100.5" x2="77" y2="97" stroke="#9e7d46" stroke-width="1.5" stroke-linecap="round"/>
+            <line x1="39.5" y1="100.5" x2="43" y2="97" stroke="#9e7d46" stroke-width="1.5" stroke-linecap="round"/>
+            <!-- Hands -->
+            <line x1="60" y1="80" x2="60" y2="60" stroke="#f5f4f0" stroke-width="2" stroke-linecap="round"/>
+            <line x1="60" y1="80" x2="75" y2="75" stroke="#f5f4f0" stroke-width="1.5" stroke-linecap="round"/>
+            <line x1="60" y1="80" x2="55" y2="95" stroke="#c8a96e" stroke-width="1" stroke-linecap="round" opacity="0.7"/>
+            <circle cx="60" cy="80" r="2.5" fill="#c8a96e"/>
+            <!-- Crown -->
+            <rect x="98" y="77" width="6" height="6" rx="1" fill="#2a2a2e" stroke="#9e7d46" stroke-width="0.8"/>
+          </svg>
+          <div class="product-card-tag">In Stock</div>
+        </div>
+        <div class="product-card-body">
+          <div class="product-brand">Rolex</div>
+          <div class="product-name">GMT-Master II</div>
+          <div class="product-ref">Ref. 126710BLRO "Pepsi"</div>
+          <div class="product-price">$18,500</div>
+        </div>
+      </div>
+
+      <!-- Card 2 -->
+      <div class="product-card">
+        <div class="product-card-img">
+          <svg class="watch-svg" viewBox="0 0 120 160" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <rect x="44" y="0" width="32" height="40" rx="2" fill="#2a2a2e" stroke="#3a3a3e"/>
+            <rect x="44" y="120" width="32" height="40" rx="2" fill="#2a2a2e" stroke="#3a3a3e"/>
+            <!-- Octagonal case -->
+            <polygon points="40,52 80,52 100,72 100,108 80,128 40,128 20,108 20,72" fill="#1c1c1f" stroke="#c8a96e" stroke-width="1.5"/>
+            <polygon points="43,55 77,55 96,74 96,106 77,125 43,125 24,106 24,74" fill="#0a0a0b"/>
+            <!-- Integrated bracelet lines -->
+            <line x1="24" y1="74" x2="20" y2="72" stroke="#9e7d46" stroke-width="1" opacity="0.6"/>
+            <line x1="96" y1="74" x2="100" y2="72" stroke="#9e7d46" stroke-width="1" opacity="0.6"/>
+            <!-- Dial -->
+            <circle cx="60" cy="90" r="26" stroke="#9e7d46" stroke-width="0.5" fill="none"/>
+            <line x1="60" y1="64" x2="60" y2="70" stroke="#c8a96e" stroke-width="2.5" stroke-linecap="round"/>
+            <line x1="60" y1="110" x2="60" y2="116" stroke="#c8a96e" stroke-width="2.5" stroke-linecap="round"/>
+            <line x1="86" y1="90" x2="80" y2="90" stroke="#c8a96e" stroke-width="2.5" stroke-linecap="round"/>
+            <line x1="34" y1="90" x2="40" y2="90" stroke="#c8a96e" stroke-width="2.5" stroke-linecap="round"/>
+            <line x1="60" y1="90" x2="60" y2="72" stroke="#f5f4f0" stroke-width="2" stroke-linecap="round"/>
+            <line x1="60" y1="90" x2="78" y2="83" stroke="#f5f4f0" stroke-width="1.5" stroke-linecap="round"/>
+            <circle cx="60" cy="90" r="2" fill="#c8a96e"/>
+          </svg>
+          <div class="product-card-tag" style="background:var(--surface);border:1px solid var(--gold);color:var(--gold);">Pre-Owned</div>
+        </div>
+        <div class="product-card-body">
+          <div class="product-brand">Audemars Piguet</div>
+          <div class="product-name">Royal Oak</div>
+          <div class="product-ref">Ref. 15400ST.OO.1220ST</div>
+          <div class="product-price">$32,000</div>
+        </div>
+      </div>
+
+      <!-- Card 3 -->
+      <div class="product-card">
+        <div class="product-card-img">
+          <svg class="watch-svg" viewBox="0 0 120 160" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <rect x="46" y="2" width="28" height="36" rx="14" fill="#2a2a2e" stroke="#3a3a3e"/>
+            <rect x="46" y="122" width="28" height="36" rx="14" fill="#2a2a2e" stroke="#3a3a3e"/>
+            <circle cx="60" cy="82" r="40" fill="#1c1c1f" stroke="#c8a96e" stroke-width="1.5"/>
+            <circle cx="60" cy="82" r="36" fill="#0a0a0b" stroke="#2a2a2e" stroke-width="0.5"/>
+            <circle cx="60" cy="82" r="30" stroke="#9e7d46" stroke-width="0.3" fill="none" stroke-dasharray="2 4"/>
+            <!-- Roman numeral-style dashes -->
+            <line x1="60" y1="52" x2="60" y2="58" stroke="#c8a96e" stroke-width="2" stroke-linecap="round"/>
+            <line x1="90" y1="82" x2="84" y2="82" stroke="#c8a96e" stroke-width="2" stroke-linecap="round"/>
+            <line x1="60" y1="112" x2="60" y2="106" stroke="#c8a96e" stroke-width="2" stroke-linecap="round"/>
+            <line x1="30" y1="82" x2="36" y2="82" stroke="#c8a96e" stroke-width="2" stroke-linecap="round"/>
+            <line x1="81.2" y1="60.8" x2="76.9" y2="65.1" stroke="#9e7d46" stroke-width="1.5"/>
+            <line x1="38.8" y1="60.8" x2="43.1" y2="65.1" stroke="#9e7d46" stroke-width="1.5"/>
+            <line x1="81.2" y1="103.2" x2="76.9" y2="98.9" stroke="#9e7d46" stroke-width="1.5"/>
+            <line x1="38.8" y1="103.2" x2="43.1" y2="98.9" stroke="#9e7d46" stroke-width="1.5"/>
+            <line x1="60" y1="82" x2="60" y2="60" stroke="#e8e8ec" stroke-width="2.5" stroke-linecap="round"/>
+            <line x1="60" y1="82" x2="76" y2="76" stroke="#e8e8ec" stroke-width="2" stroke-linecap="round"/>
+            <line x1="60" y1="82" x2="54" y2="98" stroke="#c8a96e" stroke-width="1" opacity="0.8"/>
+            <circle cx="60" cy="82" r="3" fill="#c8a96e"/>
+          </svg>
+        </div>
+        <div class="product-card-body">
+          <div class="product-brand">Omega</div>
+          <div class="product-name">Speedmaster Professional</div>
+          <div class="product-ref">Ref. 310.30.42.50.01.001</div>
+          <div class="product-price">$7,400</div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+</section>
+
+<!-- FEATURE CARDS -->
+<section style="background: var(--charcoal);">
+  <div class="reveal">
+    <div class="section-label">06 — Feature Cards</div>
+    <div class="cards-grid">
+      <div class="card">
+        <svg class="card-icon" viewBox="0 0 40 40" fill="none" stroke="currentColor" stroke-width="1.2">
+          <path d="M20 4l2.7 8.3H34l-9.3 6.8 3.6 10.9L20 24l-8.3 6 3.6-10.9L6 13.3h11.3z"/>
+        </svg>
+        <div class="card-title">Authenticity Guaranteed</div>
+        <div class="card-body">Every timepiece undergoes rigorous authentication by our Swiss-trained watchmakers. Certificates of authenticity included with all purchases.</div>
+        <a href="#" class="card-link">Learn More <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 12h14"/><path d="m12 5 7 7-7 7"/></svg></a>
+      </div>
+
+      <div class="card">
+        <svg class="card-icon" viewBox="0 0 40 40" fill="none" stroke="currentColor" stroke-width="1.2">
+          <rect x="6" y="8" width="28" height="24" rx="3"/>
+          <path d="M6 14h28"/>
+          <path d="M14 4v4M26 4v4"/>
+        </svg>
+        <div class="card-title">Same Day Payment</div>
+        <div class="card-body">Free insured overnight shipping labels provided. Wire transfer payments issued the same day we receive your watch. No waiting, no hassle.</div>
+        <a href="#" class="card-link">Get a Quote <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 12h14"/><path d="m12 5 7 7-7 7"/></svg></a>
+      </div>
+
+      <div class="card">
+        <svg class="card-icon" viewBox="0 0 40 40" fill="none" stroke="currentColor" stroke-width="1.2">
+          <circle cx="20" cy="16" r="8"/>
+          <path d="M6 34c0-7.7 6.3-14 14-14s14 6.3 14 14"/>
+        </svg>
+        <div class="card-title">Expert Consultation</div>
+        <div class="card-body">Three generations of watchmaking expertise. Our specialists help you find the perfect timepiece for your style, wrist, and collection.</div>
+        <a href="#" class="card-link">Schedule Visit <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 12h14"/><path d="m12 5 7 7-7 7"/></svg></a>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- HERO BANNER COMPONENT -->
+<section>
+  <div class="reveal">
+    <div class="section-label">07 — Hero Banner Component</div>
+    <div class="hero-banner">
+      <div class="hero-banner-bg"></div>
+      <div>
+        <div class="banner-label">New Arrivals — Summer 2025</div>
+        <div class="banner-title">The Tudor<br><em>Black Bay</em><br>Collection</div>
+        <div class="banner-body">Explore the latest additions to our Tudor inventory — Official Authorized Dealer, with full manufacturer warranty and in-store service.</div>
+        <a class="btn btn-primary" href="#">
+          <span class="btn-primary-inner">
+            Shop Tudor
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M5 12h14"/><path d="m12 5 7 7-7 7"/></svg>
+          </span>
+        </a>
+      </div>
+      <div class="banner-img-area">
+        <svg width="220" height="220" viewBox="0 0 220 220" fill="none" xmlns="http://www.w3.org/2000/svg" style="opacity:0.7;">
+          <circle cx="110" cy="110" r="100" stroke="#c8a96e" stroke-width="1" opacity="0.3"/>
+          <circle cx="110" cy="110" r="85" stroke="#c8a96e" stroke-width="1.5" fill="#0a0a0b"/>
+          <circle cx="110" cy="110" r="78" stroke="#2a2a2e" stroke-width="0.5" fill="none"/>
+          <circle cx="110" cy="110" r="65" stroke="#9e7d46" stroke-width="0.5" fill="none" stroke-dasharray="3 6"/>
+          <!-- Tudor shield motif simplified -->
+          <path d="M110 44 L126 60 L126 80 L110 90 L94 80 L94 60 Z" fill="#c8a96e" opacity="0.15" stroke="#c8a96e" stroke-width="1"/>
+          <!-- Hour marks big -->
+          <rect x="108" y="30" width="4" height="12" rx="2" fill="#c8a96e"/>
+          <rect x="108" y="178" width="4" height="12" rx="2" fill="#c8a96e"/>
+          <rect x="178" y="108" width="12" height="4" rx="2" fill="#c8a96e"/>
+          <rect x="30" y="108" width="12" height="4" rx="2" fill="#c8a96e"/>
+          <!-- Smaller marks -->
+          <rect x="155" y="59" width="3" height="9" rx="1.5" fill="#9e7d46" transform="rotate(30 156.5 63.5)"/>
+          <rect x="155" y="149" width="3" height="9" rx="1.5" fill="#9e7d46" transform="rotate(-30 156.5 153.5)"/>
+          <rect x="62" y="59" width="3" height="9" rx="1.5" fill="#9e7d46" transform="rotate(-30 63.5 63.5)"/>
+          <rect x="62" y="149" width="3" height="9" rx="1.5" fill="#9e7d46" transform="rotate(30 63.5 153.5)"/>
+          <!-- Hands -->
+          <line x1="110" y1="110" x2="110" y2="52" stroke="#f5f4f0" stroke-width="3" stroke-linecap="round"/>
+          <line x1="110" y1="110" x2="148" y2="92" stroke="#f5f4f0" stroke-width="2.5" stroke-linecap="round"/>
+          <line x1="110" y1="110" x2="98" y2="148" stroke="#c8a96e" stroke-width="1.5" stroke-linecap="round"/>
+          <circle cx="110" cy="110" r="5" fill="#c8a96e"/>
+          <circle cx="110" cy="110" r="2" fill="#0a0a0b"/>
+        </svg>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- FORM -->
+<section style="background: var(--charcoal);">
+  <div class="reveal">
+    <div class="section-label">08 — Form Elements</div>
+    <div class="form-showcase">
+      <div class="form-group">
+        <label class="form-label">First Name</label>
+        <input type="text" class="form-input" placeholder="Alexander">
+      </div>
+      <div class="form-group">
+        <label class="form-label">Last Name</label>
+        <input type="text" class="form-input" placeholder="Sterling">
+      </div>
+      <div class="form-group">
+        <label class="form-label">Email Address</label>
+        <input type="email" class="form-input" placeholder="a.sterling@example.com">
+      </div>
+      <div class="form-group">
+        <label class="form-label">Phone</label>
+        <input type="tel" class="form-input" placeholder="+1 (215) 000-0000">
+      </div>
+      <div class="form-group full">
+        <label class="form-label">Interested In</label>
+        <select class="form-input">
+          <option value="" disabled selected>Select a brand or service</option>
+          <option>Rolex</option>
+          <option>Tudor</option>
+          <option>Omega</option>
+          <option>Longines</option>
+          <option>Sell My Watch</option>
+          <option>Watch Service & Repair</option>
+        </select>
+      </div>
+      <div class="form-group full">
+        <label class="form-label">Message</label>
+        <input type="text" class="form-input" placeholder="Tell us about the watch you're looking for...">
+      </div>
+    </div>
+    <div style="margin-top:32px;">
+      <a class="btn btn-primary" href="#">
+        <span class="btn-primary-inner">
+          Submit Inquiry
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M5 12h14"/><path d="m12 5 7 7-7 7"/></svg>
+        </span>
+      </a>
+    </div>
+  </div>
+</section>
+
+<!-- BADGES & TAGS -->
+<section>
+  <div class="reveal">
+    <div class="section-label">09 — Badges & Tags</div>
+    <div class="badges-showcase">
+      <span class="badge badge-gold badge-dot">In Stock</span>
+      <span class="badge badge-gold">New Arrival</span>
+      <span class="badge badge-dark badge-dot">Pre-Owned</span>
+      <span class="badge badge-outline">Authorized Dealer</span>
+      <span class="badge badge-outline">Swiss-Trained</span>
+      <span class="badge badge-sold badge-dot">Sold</span>
+      <span class="badge badge-dark">Certified Authentic</span>
+      <span class="badge badge-gold">Limited Edition</span>
+    </div>
+  </div>
+</section>
+
+<!-- ICONS -->
+<section style="background: var(--charcoal);">
+  <div class="reveal">
+    <div class="section-label">10 — Icon Set</div>
+    <div class="icons-grid">
+      <div class="icon-item">
+        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+        <span>Time</span>
+      </div>
+      <div class="icon-item">
+        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
+        <span>Auth</span>
+      </div>
+      <div class="icon-item">
+        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="3" y="3" width="18" height="18" rx="2"/><path d="M9 9h6M9 12h6M9 15h4"/></svg>
+        <span>Docs</span>
+      </div>
+      <div class="icon-item">
+        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M20 7H4a2 2 0 0 0-2 2v6a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2V9a2 2 0 0 0-2-2z"/><circle cx="12" cy="12" r="2"/></svg>
+        <span>Pay</span>
+      </div>
+      <div class="icon-item">
+        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg>
+        <span>Visit</span>
+      </div>
+      <div class="icon-item">
+        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"/></svg>
+        <span>Call</span>
+      </div>
+      <div class="icon-item">
+        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,13 2,6"/></svg>
+        <span>Mail</span>
+      </div>
+      <div class="icon-item">
+        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg>
+        <span>Search</span>
+      </div>
+      <div class="icon-item">
+        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/></svg>
+        <span>Save</span>
+      </div>
+      <div class="icon-item">
+        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M6 2L3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4z"/><line x1="3" y1="6" x2="21" y2="6"/><path d="M16 10a4 4 0 0 1-8 0"/></svg>
+        <span>Cart</span>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- SPACING SCALE -->
+<section>
+  <div class="reveal">
+    <div class="section-label">11 — Spacing Scale</div>
+    <div class="spacing-showcase">
+      <div class="spacing-row"><div class="spacing-bar" style="width:4px;"></div><div class="spacing-label">--space-1</div><div class="spacing-px">4px</div></div>
+      <div class="spacing-row"><div class="spacing-bar" style="width:8px;"></div><div class="spacing-label">--space-2</div><div class="spacing-px">8px</div></div>
+      <div class="spacing-row"><div class="spacing-bar" style="width:12px;"></div><div class="spacing-label">--space-3</div><div class="spacing-px">12px</div></div>
+      <div class="spacing-row"><div class="spacing-bar" style="width:16px;"></div><div class="spacing-label">--space-4</div><div class="spacing-px">16px</div></div>
+      <div class="spacing-row"><div class="spacing-bar" style="width:24px;"></div><div class="spacing-label">--space-6</div><div class="spacing-px">24px</div></div>
+      <div class="spacing-row"><div class="spacing-bar" style="width:32px;"></div><div class="spacing-label">--space-8</div><div class="spacing-px">32px</div></div>
+      <div class="spacing-row"><div class="spacing-bar" style="width:40px;"></div><div class="spacing-label">--space-10</div><div class="spacing-px">40px</div></div>
+      <div class="spacing-row"><div class="spacing-bar" style="width:64px;"></div><div class="spacing-label">--space-16</div><div class="spacing-px">64px</div></div>
+      <div class="spacing-row"><div class="spacing-bar" style="width:100px;"></div><div class="spacing-label">--space-25</div><div class="spacing-px">100px</div></div>
+    </div>
+  </div>
+</section>
+
+<div class="gold-rule"></div>
+
+<!-- FOOTER -->
+<footer class="page-footer">
+  <div class="footer-brand">
+    Precision Watches
+    <span>Design System — Watchmakers Since 1946</span>
+  </div>
+  <div class="footer-note">
+    <strong>Portfolio Case Study</strong><br>
+    UI/UX Design · Luxury E-Commerce<br>
+    Behance Portfolio Presentation
+  </div>
+</footer>
+
+<script>
+  // Scroll reveal
+  const reveals = document.querySelectorAll('.reveal');
+  const observer = new IntersectionObserver((entries) => {
+    entries.forEach((entry, i) => {
+      if (entry.isIntersecting) {
+        setTimeout(() => entry.target.classList.add('visible'), i * 80);
+        observer.unobserve(entry.target);
+      }
+    });
+  }, { threshold: 0.08 });
+  reveals.forEach(el => observer.observe(el));
+</script>
+</body>
+</html>
